@@ -1,0 +1,15 @@
+---
+variables:
+  awsRegion: ''
+  elasticContainerRegistry: ''
+  imageName: ''
+
+dockerTag:
+  stage: version
+  script:
+    - |
+      dockerImageMetadata
+      echo "Tagging Docker Image"
+      docker pull "${imageName}"
+      dockerEndpoint="${elasticContainerRegistry}/${projectName}:${projectVersion}"
+      docker tag "${imageName}" "${dockerEndpoint}"

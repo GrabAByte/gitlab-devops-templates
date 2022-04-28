@@ -1,0 +1,11 @@
+---
+variables:
+  appPath: '.'
+
+javascriptLint:
+  stage: lint
+  script:
+    - |
+      cd "${appPath}"
+      npm install
+      npm run style || true

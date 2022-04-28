@@ -1,0 +1,6 @@
+---
+javascriptVersion:
+  stage: build
+  script:
+    - |
+      npm run version

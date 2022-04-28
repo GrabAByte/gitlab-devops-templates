@@ -1,0 +1,15 @@
+---
+variables:
+  appPath: ''
+
+javascriptStaticTests:
+  stage: test
+  script:
+    - |
+      cd ${appPath} && \
+        nodeEnv
+        nodeDeps
+        npm install
+        npm run test
+        done
+      cd -

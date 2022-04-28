@@ -1,0 +1,18 @@
+---
+variables:
+  gitUser: $SVC_USERNAME
+  gitEmail: $SVC_EMAIL
+  gitPAT: $SVC_ACCESS_TOKEN
+
+gitTag:
+  stage: version
+  script:
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
+        gitTag
+      else
+        echo "Skipping tagging as not on mainline branch"
+      fi
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /.*Auto-gen.*/

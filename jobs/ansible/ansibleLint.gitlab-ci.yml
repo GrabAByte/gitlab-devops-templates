@@ -1,0 +1,29 @@
+---
+variables:
+  ansibleType: ''
+  strictChecking: 'true'
+
+ansibleLint:
+  stage: lint
+  script:
+    - |
+      case "${ansibleType}" in
+        playbook)
+          yamlPath='playbooks'
+        ;;
+        role)
+          yamlPath='tasks'
+        ;;
+        *)
+          echo "Not an applicable ansibleType. Choices: 'playbook/role'"
+          exit 1
+        ;;
+      esac
+
+      for yaml in $(find "${yamlPath}" -type f -name "*.yml" -o -name "*.yaml"); do
+        if "${strictChecking}"; then
+          ansible-lint "${yaml}"
+        else
+          ansible-lint "${yaml}" || true
+        fi
+      done

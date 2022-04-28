@@ -1,0 +1,14 @@
+---
+variables:
+  appPath: ''
+  strictChecking: 'true'
+
+pythonLint:
+  stage: lint
+  script:
+    - |
+      if "${strictChecking}"; then
+        pylint "${appPath}"
+      else
+        pylint "${appPath}" || true
+      fi

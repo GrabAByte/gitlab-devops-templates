@@ -1,0 +1,22 @@
+---
+variables:
+  strictChecking: 'true'
+
+ansibleMolecule:
+  stage: test
+  script:
+    - |
+      if "${strictChecking}"; then
+        docker run \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          -v ${PWD}:/var/workspace \
+          ansible-toolset:1.0.0 \
+          bash -c "molecule test"
+      else
+        docker run \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          -v ${PWD}:/var/workspace \
+          ansible-toolset:0.0.3 \
+          bash -c "molecule test" \
+          || :
+      fi

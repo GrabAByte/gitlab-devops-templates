@@ -1,0 +1,12 @@
+---
+# For use in scheduled pipelines
+variables:
+  cleanup: "false"
+  elasticContainerRegistry: ''
+
+dockerPrune:
+  stage: clean
+  script: |
+    if "${cleanup}"; then
+      docker system prune -a -f
+    fi

@@ -1,0 +1,20 @@
+---
+variables:
+  appPath: ''
+
+archive:
+  stage: archive
+  script:
+    - |
+        # Compile
+        versionBump
+        artifactName=${projectName}-${projectVersion}.zip
+
+        cd ${appPath} && \
+          zip -r ../${artifactName} . && \
+          cd ..
+
+        ls -l ${artifactName}
+
+        # Publish
+        nexusUpload

@@ -1,0 +1,14 @@
+---
+include:
+  - 'jobs/common/bashFunctions.gitlab-ci.yml'
+  - 'jobs/common/dockerECRLogin.gitlab-ci.yml'
+  - 'jobs/common/dockerPull.gitlab-ci.yml'
+  - 'jobs/common/sonarScan.gitlab-ci.yml'
+  - 'jobs/ansible/ansibleMolecule.gitlab-ci.yml'
+  - 'jobs/common/gitTag.gitlab-ci.yml'
+
+stages:
+  - prepare
+  - sonar
+  - test
+  - version

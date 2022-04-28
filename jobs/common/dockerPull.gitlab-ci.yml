@@ -1,0 +1,9 @@
+---
+variables:
+  imageName: ''
+  imageTag: ''
+
+dockerPull:
+  stage: prepare
+  script:
+    - docker pull ${imageName}/${imageTag}

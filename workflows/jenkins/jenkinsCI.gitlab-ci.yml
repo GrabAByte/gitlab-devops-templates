@@ -1,0 +1,11 @@
+---
+include:
+  - 'jobs/common/bashFunctions.gitlab-ci.yml'
+  - 'jobs/common/groovyLint.gitlab-ci.yml'
+  - 'jobs/common/sonarScan.gitlab-ci.yml'
+  - 'jobs/common/gitTag.gitlab-ci.yml'
+
+stages:
+  - lint
+  - sonar
+  - version

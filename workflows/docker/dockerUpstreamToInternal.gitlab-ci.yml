@@ -1,0 +1,13 @@
+---
+include:
+  - 'jobs/common/bashFunctions.gitlab-ci.yml'
+  - 'jobs/common/dockerECRLogin.gitlab-ci.yml'
+  - 'jobs/docker/dockerRepository.gitlab-ci.yml'
+  - 'jobs/docker/dockerTag.gitlab-ci.yml'
+  - 'jobs/docker/dockerPublish.gitlab-ci.yml'
+
+stages:
+  - prepare
+  - build
+  - version
+  - publish

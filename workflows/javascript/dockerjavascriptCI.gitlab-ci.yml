@@ -1,0 +1,24 @@
+---
+include:
+  - 'jobs/common/bashFunctions.gitlab-ci.yml'
+  - 'jobs/common/dockerECRLogin.gitlab-ci.yml'
+  - 'jobs/docker/dockerRepository.gitlab-ci.yml'
+  - 'jobs/javascript/javascriptStaticTests.gitlab-ci.yml'
+  - 'jobs/common/sonarScan.gitlab-ci.yml'
+  - 'jobs/common/archive.gitlab-ci.yml'
+  - 'jobs/docker/dockerLint.gitlab-ci.yml'
+  - 'jobs/docker/dockerBuild.gitlab-ci.yml'
+  - 'jobs/docker/dockerPublish.gitlab-ci.yml'
+  - 'jobs/docker/dockerScan.gitlab-ci.yml'
+  - 'jobs/common/gitTag.gitlab-ci.yml'
+
+stages:
+  - prepare
+  - lint
+  - test
+  - sonar
+  - archive
+  - build
+  - publish
+  - scan
+  - version

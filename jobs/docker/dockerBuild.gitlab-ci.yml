@@ -1,0 +1,23 @@
+---
+variables:
+  dockerFilePath: ''
+  elasticContainerRegistry: ''
+
+dockerBuild:
+  stage: build
+  script:
+    - |
+      versionBump
+      echo "Building Docker Image"
+      echo "${projectName}"
+      echo "${projectVersion}"
+      dockerEndpoint="${elasticContainerRegistry}/${projectName}:${projectVersion}"
+      ## We are able to build even if an ARG isnt present in the Dockerfile, but we should try do make dockerBuildArgs dynamic somehow in the future.
+      docker build \
+        -t="${dockerEndpoint}" \
+        --build-arg nexusCredential=$NEXUS_USER:$NEXUS_PWD \
+        --build-arg releaseType=${releaseType} \
+        --build-arg projectVersion=${projectVersion} \
+        --build-arg projectName=${projectName} \
+        -f "${dockerfilePath}" .
+    - docker images

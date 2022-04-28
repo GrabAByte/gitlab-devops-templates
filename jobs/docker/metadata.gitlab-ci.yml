@@ -1,0 +1,16 @@
+---
+variables:
+  imageName: ''
+
+default:
+  before_script:
+    - |
+      if [[ "${imageName}" != *":"* ]]; then
+        dockerImage="${imageName}"
+        dockerTag='latest'
+      else
+        dockerImage=$(echo "${imageName}" | cut -d ':' -f 1)
+        dockerTag=$(echo "${imageName}" | cut -d ':' -f 2)
+      fi
+      projectName="${dockerImage}"
+      projectVersion="${dockerTag}"

@@ -1,0 +1,10 @@
+---
+variables:
+  groovyPath: '.'
+
+groovyLint:
+  stage: lint
+  script:
+    - npm-groovy-lint \
+        --path "${groovyPath}" \
+        --files "**/*.groovy" \

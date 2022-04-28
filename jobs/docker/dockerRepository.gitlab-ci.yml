@@ -1,0 +1,7 @@
+---
+dockerRepository:
+  stage: prepare
+  script:
+    - dockerImageMetadata
+    - projectMetadata
+    - aws ecr describe-repositories --repository-names "${projectName}" || aws ecr create-repository --repository-name "${projectName}" --image-scanning-configuration scanOnPush=true

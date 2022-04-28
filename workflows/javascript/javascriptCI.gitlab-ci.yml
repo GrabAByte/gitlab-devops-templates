@@ -1,0 +1,11 @@
+---
+include:
+  - 'jobs/common/dockerECRLogin.gitlab-ci.yml'
+  - 'jobs/javascript/javascriptFunctions.gitlab-ci.yml'
+  - 'jobs/common/sonarScan.gitlab-ci.yml'
+  - 'jobs/javascript/javascriptStaticTests.gitlab-ci.yml'
+
+stages:
+  - prepare
+  - sonar
+  - test

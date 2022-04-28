@@ -1,0 +1,161 @@
+---
+variables:
+  metadataPath: ''
+  nexusCredential: "$NEXUS_USER:$NEXUS_PWD"
+  nexusUrl: ''
+  nexusGroup: ''
+  npmDependencies: ''
+  npmRealm: ''
+  npmRegistryUrl: ''
+  npmRegistryDeps: ''
+  npmVersion: ''
+
+default:
+  before_script:
+    - |
+      ## Fail-Fast
+      if [[ "$CI_COMMIT_MESSAGE" == *"Auto-gen"* ]]; then
+        echo "This pipeline was auto-triggered by Gitlab-CI Pipeline User. Exiting"
+        exit 0
+      fi
+
+      projectMetadata() {
+        case "${metadataPath}" in
+          *.yml)
+            projectName=$(grep ^name "${metadataPath}" | cut -d ':' -f2 | tr -d ' ",')
+            if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
+              projectVersion=$(grep -w version "${metadataPath}" | cut -d ':' -f2 | tr -d ' ",')
+              releaseType=releases
+            else
+              projectVersion=$(grep -w version "${metadataPath}" | cut -d ':' -f2 | tr -d ' ",')-${CI_PIPELINE_ID}
+              releaseType=release-candidates
+            fi
+          ;;
+          *.json)
+            projectName=$(grep name "${metadataPath}" | cut -d ':' -f2 | tr -d ' ",')
+            if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
+              projectVersion=$(grep version "${metadataPath}" | cut -d ':' -f2 | tr -d ' ",')
+              releaseType=releases
+            else
+              projectVersion=$(grep version "${metadataPath}" | cut -d ':' -f2 | tr -d ' ",')-${CI_PIPELINE_ID}
+              releaseType=release-candidates
+            fi
+          ;;
+        esac
+
+        majorVersion=$(echo ${projectVersion} | cut -d '.' -f1)
+        minorVersion=$(echo ${projectVersion} | cut -d '.' -f2)
+        patchVersion=$(echo ${projectVersion} | cut -d '.' -f3)
+        currentVersion=${majorVersion}.${minorVersion}.${patchVersion}
+      }
+
+      nexusUpload () {
+        ## ${artifactName} must be derived from the calling stage
+        if [ -n "${nexusUrl}" ] && [ -n "${nexusGroup}" ]; then
+          projectMetadata
+          curl -v -u ${nexusCredential} --upload-file ${artifactName} ${nexusUrl}/nexus/service/local/repositories/${nexusGroup}/content/${releaseType}/$CI_PROJECT_NAME/${artifactName} && \
+          rm -f ${artifactName}
+        fi
+      }
+
+      versionBump() {
+        projectMetadata
+        if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
+          changeBranch=$(git log --first-parent --merges -1 --oneline | cut -d "'" -f2)
+          changeType=$(git log --first-parent --merges -1 --oneline | cut -d "'" -f2 | cut -d '/' -f1)
+          case ${changeType} in
+            breaking)
+              majorVersion=$(( ${majorVersion} + 1 ))
+              minorVersion=0
+              patchVersion=0
+            ;;
+            feat|perf|refactor)
+              minorVersion=$(( ${minorVersion} + 1 ))
+              patchVersion=0
+            ;;
+            fix|chore|docs|test)
+              patchVersion=$(( ${patchVersion} + 1 ))
+            ;;
+            *)
+              exit 1
+            ;;
+          esac
+
+          newVersion=${majorVersion}.${minorVersion}.${patchVersion}
+          sed -i "s/${currentVersion}/${newVersion}/" ${metadataPath}
+          projectVersion=${newVersion}
+        fi
+      }
+
+      generateChangelog() {
+        if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
+          versionBump
+          versionTitle=$(echo "## [${newVersion}] - ($(date +%d-%m-%Y))")
+          description=$(echo  "- ${changeType}: $(git log --oneline -2 | tail -1)")
+
+          if [ -f CHANGELOG.md ]; then
+            sed -i "/Changelog/a ${versionTitle}" CHANGELOG.md
+            sed -i "/Changelog/{G;}" CHANGELOG.md
+            sed -i "/${newVersion}/a ${description}" CHANGELOG.md
+          else
+            echo "No CHANGELOG.md found in the root of the repository. Exiting"
+            exit 1
+          fi
+        fi
+      }
+
+      dockerImageMetadata() {
+        if [[ "${imageName}" != *":"* ]]; then
+          dockerImage=${imageName}
+          dockerTag=latest
+        else
+          dockerImage=$(echo "${imageName}" | cut -d ':' -f 1)
+          dockerTag=$(echo "${imageName}" | cut -d ':' -f 2)
+        fi
+        projectName=${dockerImage}
+        projectVersion=${dockerTag}
+      }
+
+      gitConfig() {
+        git config --global user.name "gitlab-runner"
+        git config --global user.email "gitlab-runner@grababyte.gitlab.com"
+        git config --global push.default matching
+      }
+
+      gitPush() {
+        git remote add gitlab-ci "https://${gitUser}:${gitPAT}@${CI_REPOSITORY_URL#*@}"
+        git checkout $CI_DEFAULT_BRANCH
+        git add "${metadataPath}"
+        git add CHANGELOG.md
+        git tag "${newVersion}"
+        git commit -m "Pipeline(gitlab-ci): Auto-generating CHANGELOG.md and versioning"
+        git push gitlab-ci
+        git push --tags gitlab-ci
+        git remote rm gitlab-ci
+      }
+
+      gitTag() {
+        gitConfig
+        generateChangelog
+        gitPush
+      }
+
+      nodeEnv() {
+        . /home/gitlab-runner/.bashrc
+        source /home/gitlab-runner/.nvm/nvm.sh
+        nvm use ${npmVersion}
+        npm config set tmp /home/gitlab-runner/.npm/tmp
+        npm config set cache /home/gitlab-runner/cache
+        npm config set spin false
+        npm config set //${npmRegistryUrl}:_authToken ${NPM_AUTH_TOKEN}
+        npm config set @${npmRealm}:registry https://${npmRegistryUrl}
+      }
+
+      nodeDeps() {
+        for npmRegistryDep in ${npmRegistryDeps[@]}; do
+          npm config set @${npmRegistryDep}:registry https://${npmRegistryUrl}
+        done
+        for dependency in ${npmDependencies[@]}; do
+          npm install ${dependency}
+        done
+      }

@@ -1,0 +1,25 @@
+---
+variables:
+  strictChecking: 'true'
+
+dockerScan:
+  stage: scan
+  script:
+    - |
+      # Gather Docker project metadata
+      dockerImageMetadata
+      versionBump
+
+      # Let AWS have time to generate this report
+      sleep 60
+
+      # Render the report to pipeline
+      dockerImageScan=$(aws ecr describe-image-scan-findings --repository-name "${projectName}" --image-id imageTag="${projectVersion}")
+      echo "${dockerImageScan}"
+
+      # Some critical errors require a base OS upgrade, but we should try to make strictness compulsory eventually
+      if "${strictChecking}"; then
+        if echo "${dockerImageScan}" | grep CRITICAL; then
+          exit 1;
+        fi
+      fi

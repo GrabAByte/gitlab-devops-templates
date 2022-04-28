@@ -1,0 +1,30 @@
+---
+variables:
+  dockerImage: ''
+  dockerTag: ''
+  sonarProject: "$CI_PROJECT_NAME"
+  sonarHostUrl: ''
+  sonarSources: ''
+  sonarExtraArgs: ''
+
+sonarScan:
+  stage: sonar
+  script:
+    - |
+      docker run \
+       --privileged \
+       --user gitlab-runner \
+       -v ${PWD}:/var/workspace \
+       ${dockerImage}:${dockerTag} \
+         bash -c "export SONAR_SCANNER_OPTS='-Djavax.net.ssl.trustStore=/etc/ssl/certs/cacerts -Djavax.net.ssl.trustStorePassword=$SONAR_TRUST_STORE' && \
+           sonar-scanner \
+             -Dsonar.host.url=${sonarHostUrl} \
+             -Dsonar.projectBaseDir=/var/workspace \
+             -Dsonar.projectName=${sonarProject} \
+             -Dsonar.projectKey=${sonarProject} \
+             -Dsonar.branch.name=$CI_COMMIT_BRANCH \
+             -Dsonar.sources=${sonarSources} \
+             -Dsonar.login=$SONAR_TOKEN \
+             -Dsonar.qualitygate.wait=true \
+             -Dsonar.qualitygate.timeout=1800 \
+             ${sonarExtraArgs}"

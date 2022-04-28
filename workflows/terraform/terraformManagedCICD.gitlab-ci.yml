@@ -1,0 +1,15 @@
+---
+include:
+  - 'jobs/common/bashFunctions.gitlab-ci.yml'
+  - 'jobs/terraform/terraformLint.gitlab-ci.yml'
+  - 'jobs/terraform/terraformValidate.gitlab-ci.yml'
+  - 'jobs/terraform/terraformPlan.gitlab-ci.yml'
+  - 'jobs/terraform/terraformApply.gitlab-ci.yml'
+  - 'jobs/common/gitTag.gitlab-ci.yml'
+
+stages:
+  - lint
+  - validate
+  - plan
+  - deploy
+  - version

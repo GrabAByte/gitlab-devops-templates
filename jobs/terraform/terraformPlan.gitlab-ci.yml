@@ -1,0 +1,10 @@
+---
+variables:
+  terraformEnvironments: dev
+  terraformVersion: '1.1.0'
+
+terraformPlan:
+  stage: plan
+  script:
+    - terraform_${terraformVersion} -chdir=environments/${terraformEnvironment} init
+    - terraform_${terraformVersion} -chdir=environments/${terraformEnvironment} plan

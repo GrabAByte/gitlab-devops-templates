@@ -1,0 +1,16 @@
+---
+variables:
+  appPath: ''
+  testDirectory: ''
+
+pythonStaticTests:
+  stage: test
+  script:
+    - |
+      if [ -n "${testDirectory}" ] && [ -d "${appPath}/${testDirectory}" ]; then
+        cd "${appPath}" && \
+          python -m unittest discover "${testDirectory}" && \
+          cd -
+      else
+        echo "No Test cases present, skipping."
+      fi

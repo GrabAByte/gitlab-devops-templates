@@ -1,0 +1,13 @@
+---
+variables:
+  terraformEnvironment: dev
+
+terraformLint:
+  stage: lint
+  script:
+    - |
+        docker run \
+          --privileged \
+          --rm \
+          -v $(pwd)/environments/${terraformEnvironment}:/data \
+          -t ghcr.io/terraform-linters/tflint

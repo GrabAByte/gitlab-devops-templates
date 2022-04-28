@@ -1,0 +1,11 @@
+---
+xmlLint:
+  stage: lint
+  script:
+    - |
+        xmlFiles=($(find . -name *.xml))
+        for xml in "${xmlFiles[@]}"; do
+          echo "Linting: ${xml}"
+          xmllint "${xml}" && \
+            echo "Linting Successful for: ${xml}"
+        done

@@ -1,0 +1,16 @@
+---
+variables:
+  awsRegion: ''
+  elasticContainerRegistry: ''
+
+dockerPublish:
+  stage: publish
+  script:
+    - |
+      dockerImageMetadata
+      versionBump
+      echo "Publishing Docker Image"
+      echo "${projectName}"
+      echo "${projectVersion}"
+      dockerEndpoint="${elasticContainerRegistry}/${projectName}:${projectVersion}"
+      docker push "${dockerEndpoint}"

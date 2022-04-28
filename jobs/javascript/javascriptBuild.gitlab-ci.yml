@@ -1,0 +1,5 @@
+---
+javascriptBuild:
+  stage: build
+  script:
+    - npm run build

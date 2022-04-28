@@ -1,0 +1,11 @@
+---
+jsonLint:
+  stage: lint
+  script:
+    - |
+        jsonFiles=($(find . -name *.json))
+        for json in "${jsonFiles[@]}"; do
+          echo "Linting: ${json}"
+          jsonlint "${json}" && \
+            echo "Linting Successful: ${json}"
+        done

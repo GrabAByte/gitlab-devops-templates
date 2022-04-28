@@ -1,0 +1,10 @@
+---
+variables:
+  dockerfilePath: ''
+
+dockerLint:
+  stage: lint
+  script:
+    - echo "Performing Docker Lint"
+    - echo "${PWD}"
+    - docker run --rm -i -v ${PWD}/.hadolint.yml:/.hadolint.yml hadolint/hadolint < "${dockerfilePath}"

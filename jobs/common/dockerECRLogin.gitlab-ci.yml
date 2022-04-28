@@ -1,0 +1,10 @@
+---
+variables:
+  awsRegion: ''
+  elasticContainerRegistry: ''
+
+dockerLogin:
+  stage: prepare
+  script:
+    - dockerPassword=$(aws --region "${awsRegion}" ecr get-login-password)
+    - docker login -u AWS -p "${dockerPassword}" "${elasticContainerRegistry}" # yamllint disable-line
