@@ -8,17 +8,17 @@ name: CI
 
 jobs:
   get-version:
-    uses: GrabAByte/github-devops-workflows/.github/workflows/getVersion.yml@0.0.5
+    uses: GrabAByte/github-devops-workflows/.github/workflows/getVersion.yml@0.5.3
     with:
       metadataFile: 'metadata.json'
       metadataPath: .
   yaml-lint:
-    uses: GrabAByte/github-devops-workflows/.github/workflows/yamlLint.yml@0.0.5
+    uses: GrabAByte/github-devops-workflows/.github/workflows/yamlLint.yml@0.5.3
     with:
       yamlPath: .
     needs: get-version
   update-version:
-    uses: GrabAByte/github-devops-workflows/.github/workflows/updateVersion.yml@0.0.5
+    uses: GrabAByte/github-devops-workflows/.github/workflows/updateVersion.yml@0.5.3
     with:
       gitUsername: 'grababyte'
       gitEmail: 'grababyte@github.com'
