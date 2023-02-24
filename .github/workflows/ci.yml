@@ -8,17 +8,23 @@ name: CI
 
 jobs:
   get-version:
-    uses: GrabAByte/github-devops-workflows/.github/workflows/getVersion.yml@0.5.3
+    uses: GrabAByte/github-devops-workflows/.github/workflows/getVersion.yml@0.6.1
     with:
       metadataFile: 'metadata.json'
       metadataPath: .
   yaml-lint:
-    uses: GrabAByte/github-devops-workflows/.github/workflows/yamlLint.yml@0.5.3
+    uses: GrabAByte/github-devops-workflows/.github/workflows/yamlLint.yml@0.6.1
     with:
       yamlPath: .
     needs: get-version
+  sonar-scan:
+    uses: GrabAByte/github-devops-workflows/.github/workflows/sonarScan.yml@0.6.1
+    secrets:
+      WORKFLOW_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    needs: get-version
   update-version:
-    uses: GrabAByte/github-devops-workflows/.github/workflows/updateVersion.yml@0.5.3
+    uses: GrabAByte/github-devops-workflows/.github/workflows/updateVersion.yml@0.6.1
     with:
       gitUsername: 'grababyte'
       gitEmail: 'grababyte@github.com'
