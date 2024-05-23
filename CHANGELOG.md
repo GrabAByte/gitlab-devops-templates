@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.1.1] - (23-05-2024)
+fix: (9773b28) bump the workflows to latest version of 0.6.4 (#3)
+
 ## [0.1.0] - (24-02-2023)
 feat: (9ef5fce) Add sonar (#2)
 
